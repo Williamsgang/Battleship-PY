@@ -1,5 +1,4 @@
 import random
-from re import S
 
 """
 Welcome to Battleship-PY!
@@ -24,31 +23,31 @@ ship_count = 5 # <=========== Change to player input
 board_size = 10 # <========== Change to player input
 
 team1 = {
+    "team_num": 1,
     "ship_count": ship_count,
     "ship_locations": [],
     "board": []
     }
 
 team2 = {
+    "team_num": 2,
     "ship_count": ship_count,
     "ship_locations": [],
     "board": []
     }
 
 teams = [team1, team2]
-boards = [team1["board"], team2["board"]]
 
-def create_boards(boards):
-    for board in boards: 
+def create_boards(teams):
+    for team in teams:
         for _ in range(board_size):
-            board.append(["O"] * board_size)
+            team["board"].append(["O"] * board_size)
 
 # Prints the board when the method is called
-def print_board(boards):
-    for board in boards: 
-        print("=======================================")
-        for row in board:
-            print(" ".join(row))
+def print_board(teams):
+    for team in teams:
+        for _ in team["board"]: # <============================= FIX THIS LINE =====================================>
+            print(" ".join(_))
 
 # Method for randomizing the row value for ships
 def random_row(boards):
@@ -75,16 +74,27 @@ def get_ship_locations(teams, boards):
     # TODO: Logic for previously hit locations
     # TODO: Logic for misses
     # TODO print the board after every shot
-    
-def debug_information(boards):
-    # Debug for getting the ship locations for 
-    print("Team 1 ship locations: ", team1["ship_locations"])
-    print("Team 2 ship locations: ", team2["ship_locations"])
-    print("Board size")
-    create_boards(boards)
-    print_board(boards)
 
-debug_information(boards)
+# Debug for getting each team information
+def debug_information(teams):
+    for team in teams:
+        create_boards(teams)
+
+        print("============================")
+        print("Team " + str(team["team_num"]) + " debug information")
+        print("Team " + str(team["team_num"]) + " ship count: ", team["ship_count"])
+        print("Team " + str(team["team_num"]) + " ship locations: ", team["ship_locations"])
+        print("Team " + str(team["team_num"]) + " board: ", team["board"])
+        print("============================")
+        print()
+        
+        print_board(team)
+        
+    # print("Board size")
+    # create_boards(boards)
+    # print_board(boards)
+
+debug_information(teams)
 
 """
 TODO: Multiple ships: Instead of just one battleship, you can have multiple ships of different sizes placed randomly on the board.
