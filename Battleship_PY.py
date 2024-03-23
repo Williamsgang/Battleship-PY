@@ -18,47 +18,49 @@ __________         __    __  .__                .__    .__
 """
 )
 
-game_over = True # <========= Change to false when game is built 
-ship_count = 5 # <=========== Change to player input
-board_size = 10 # <========== Change to player input
+game_over = True # <=========== Change to false when game is built 
+ship_count = 5   # <=========== Change to player input
+board_size = 5   # <=========== Change to player input
+player_num = 2   # <=========== Change to player input
+players = []     # <=========== Based on player_num value
 
-team1 = {
-    "team_num": 1,
-    "ship_count": ship_count,
-    "ship_locations": [],
-    "board": []
+def new_player(num):
+    player = {
+        "player_num": num,
+        "ship_count": ship_count,
+        "ship_locations": [],
+        "board": []
     }
+    return player
+       
+def create_players(player_num, players):
+    for num in range(player_num):
+        players.append(new_player(num + 1))
 
-team2 = {
-    "team_num": 2,
-    "ship_count": ship_count,
-    "ship_locations": [],
-    "board": []
-    }
-
-teams = [team1, team2]
-
-def create_boards(teams):
-    for team in teams:
-        for _ in range(board_size):
-            team["board"].append(["O"] * board_size)
+def create_boards(players):
+    for player in players:
+        for num in range(board_size):
+            player['board'].append(["O"] * board_size)
 
 # Prints the board when the method is called
-def print_board(teams):
-    for team in teams:
-        for _ in team["board"]: # <============================= FIX THIS LINE =====================================>
-            print(" ".join(_))
+def print_board(boards):
+    return "Not implemented yet"
 
-# Method for randomizing the row value for ships
-def random_row(boards):
-    return [random.randint(0, len(board) - 1) for board in boards]
+# Method for randomizing the row value for ships                            <======================= FINISH THIS ==============================
+def random_row(board):
+    return [random.randint(0, len(row["board"]) - 1) for row in board]
 
 # Method for randomizing the column value for ships
-def random_col(boards):
-    return [random.randint(0, len(board[0]) - 1) for board in boards]
+def random_col(board):
+    return [random.randint(0, len(col["board"][0]) - 1) for col in board]
             
 # Method to obtain the ship locations within the teams
-def get_ship_locations(teams, boards):
+def get_ship_locations(ship_count, players):
+    for player in players:
+        for ship in range(ship_count):
+            random_row(player["ship_locations"])
+            random_col(player["ship_locations"])
+
     return "Not implemented yet"
 
 # TODO: Obtain the ship locations for each team
@@ -75,26 +77,25 @@ def get_ship_locations(teams, boards):
     # TODO: Logic for misses
     # TODO print the board after every shot
 
-# Debug for getting each team information
-def debug_information(teams):
-    for team in teams:
-        create_boards(teams)
 
-        print("============================")
-        print("Team " + str(team["team_num"]) + " debug information")
-        print("Team " + str(team["team_num"]) + " ship count: ", team["ship_count"])
-        print("Team " + str(team["team_num"]) + " ship locations: ", team["ship_locations"])
-        print("Team " + str(team["team_num"]) + " board: ", team["board"])
-        print("============================")
-        print()
-        
-        print_board(team)
-        
-    # print("Board size")
-    # create_boards(boards)
-    # print_board(boards)
+# Debug for getting each player information
+def player_debug_information(players):
+    for player in players:
+        print("==================================")
+        print("")
+        print(f"Player {player['player_num']}:")
+        for key, value in player.items():
+            print(f"{key}: {value}")
+        print("")
 
-debug_information(teams)
+def debug_information(player_num, players):
+    print('Testing debug information')
+    player_debug_information(players)
+
+
+create_players(player_num, players)
+create_boards(players)
+debug_information(player_num, players)
 
 """
 TODO: Multiple ships: Instead of just one battleship, you can have multiple ships of different sizes placed randomly on the board.
