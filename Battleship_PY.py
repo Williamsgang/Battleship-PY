@@ -1,3 +1,5 @@
+from math import e
+from os import close
 import random
 
 """
@@ -18,11 +20,39 @@ __________         __    __  .__                .__    .__
 """
 )
 
+print("""
+Welcome to Battleship!
+        
+Choose from the following options
+        
+#1: Play game
+#2: Exit game  
+""")
+
 game_over = True # <=========== Change to false when game is built 
-ship_count = 5   # <=========== Change to player input
-board_size = 5   # <=========== Change to player input
-player_num = 2   # <=========== Change to player input
-players = []     # <=========== Based on player_num value
+ship_count = None   # <=========== Change to player input
+board_size = None   # <=========== Change to player input
+player_num = None   # <=========== Change to player input
+players = None    # <=========== Based on player_num value
+
+def game():
+    selected_option = None
+    if selected_option == 1:
+        player_num = int(input("How many players are going to play? "))
+        ship_count = int(input("How many ships for each player? "))
+        create_players(player_num, players)
+        board_size = int(input("How big of a board do you want? "))
+        create_boards(players)
+        get_ship_locations(players)
+        debug_information(player_num, players)
+    elif selected_option == 2:
+        close()
+    else: 
+        print("Please select from the given values")
+    
+
+
+
 
 def new_player(num):
     player = {
@@ -43,27 +73,35 @@ def create_boards(players):
             player['board'].append(["O"] * board_size)
 
 # Prints the board when the method is called
-def print_board(boards):
-    return "Not implemented yet"
+def print_board(players):
+    for player in players:
+        print("Player " + str(player["player_num"]) + "'s board:")
+        for row in player["board"]:
+            print(" ".join(row))
+        print("=============================")
+            
 
-# Method for randomizing the row value for ships                            <======================= FINISH THIS ==============================
+# Method for randomizing the row value for ships
 def random_row(board):
-    return [random.randint(0, len(row["board"]) - 1) for row in board]
+    return random.randint(0, len(board) - 1)
 
 # Method for randomizing the column value for ships
 def random_col(board):
-    return [random.randint(0, len(col["board"][0]) - 1) for col in board]
+    return random.randint(0, len(board[0]) - 1)
             
 # Method to obtain the ship locations within the teams
-def get_ship_locations(ship_count, players):
+def get_ship_locations(players):
     for player in players:
-        for ship in range(ship_count):
-            random_row(player["ship_locations"])
-            random_col(player["ship_locations"])
+        for ship in range(player["ship_count"]):
+            ship_row = random_row(player["board"])
+            ship_col = random_col(player["board"])
+            # Prints board with the 'X' to show locations
+            while player["board"][ship_row][ship_col] != "O":
+                ship_row = random_row(player["board"])
+                ship_col = random_col(player["board"])
+            player["board"][ship_row][ship_col] = "X"
+            player["ship_locations"].append((ship_row, ship_col))
 
-    return "Not implemented yet"
-
-# TODO: Obtain the ship locations for each team
 
 
 
@@ -93,9 +131,12 @@ def debug_information(player_num, players):
     player_debug_information(players)
 
 
-create_players(player_num, players)
-create_boards(players)
-debug_information(player_num, players)
+#create_players(player_num, players)
+#create_boards(players)
+#get_ship_locations(players)
+#debug_information(player_num, players)
+# print_board(players)
+game()    
 
 """
 TODO: Multiple ships: Instead of just one battleship, you can have multiple ships of different sizes placed randomly on the board.
