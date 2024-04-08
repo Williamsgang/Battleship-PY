@@ -1,11 +1,17 @@
 import pygame
-from screen import Window
+
+from screen import Window, Button, Screens
 
 running = True
-window_info = Window
+window_info = Window(*Window.resolutions[0])
 clock = pygame.time.Clock()
+screens = Screens()
+screens.get_selected_screen()
 
-window_size = [window_info.HEIGHT, window_info.WIDTH]
+main_menu_btn = Button("Main Menu",  screens.display_screen())
+
+
+window_size = window_info.get_resolution()
 
 pygame.init()
 
@@ -21,3 +27,4 @@ while running:
     pygame.display.flip()
 
 pygame.quit()
+

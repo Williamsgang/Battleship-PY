@@ -52,6 +52,7 @@ battleships_obj.get_ship_locations(players)
 
 boards_obj.print_board(players)
 
+
 def rect_drawing(screen, color, row, column):
     return pygame.draw.rect(screen, color,
                             [(MARGIN + WIDTH) * column + MARGIN, (MARGIN + HEIGHT) * row + MARGIN, WIDTH, HEIGHT])
@@ -129,6 +130,7 @@ def game(game_done, window_size):
 game(game_over, WINDOW_SIZE)
 debug_information(players, BOARD_RECTS)
 # print(f'Board locations: {BOARD_RECTS}')
+
 
 
 # FINISHED: Multiple ships: Instead of just one battleship, you can have multiple ships of different sizes placed randomly on the board.

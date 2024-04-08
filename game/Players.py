@@ -29,11 +29,11 @@ class Players:
                 print(f"{key}: {value}")
             print("")
 
-    def check_ship_locations(self, players, BOARD_RECTS):
+    def check_ship_locations(self, players, tiles):
         for player in players:
             print(f"Player {player['player_num']}'s info: ")
             for ship_location in player["ship_locations"]:
-                if ship_location in BOARD_RECTS:
+                if ship_location in tiles:
                     print(f"Ship located at {ship_location}")
                 else:
                     print(f"No ship at {ship_location}")
