@@ -8,7 +8,7 @@ from .network import Network
 from .gui import BattleshipClientGUI
 from .game_logic import GameLogic
 from .player import Player
-from .logger import Logger
+from .logger import ClientLogger
 
 class BattleshipClient:
     def __init__(self, host, port, player_name):
@@ -16,11 +16,21 @@ class BattleshipClient:
         self.gui = BattleshipClientGUI(self)
         self.game_logic = GameLogic(self)
         self.player = Player(player_name)
-        self.logger = Logger(f"client_logs_{player_name}.log")
+        self.logger = ClientLogger(f"client_logs_{player_name}.log")
 
     def start(self):
         self.logger.log_info("Client started.")
         self.gui.start()
+        try: 
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((self.host, self.port))
+                s.sendall("Player connected")
+                data = s.recv(1024)
+
+            self.logger.log_info("Client connection succeeded")
+        except Exception as e:
+            print(e)
+            
 
     # TODO: Add methods for handling network communication, game logic, etc.
 

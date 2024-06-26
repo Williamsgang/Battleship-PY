@@ -6,12 +6,12 @@ import pickle
 from logger import Logger
 
 
-class Network:
+class ClientNetwork:
     def __init__(self, host, port):
         self.host = host
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.logger = Logger(f"client_server_logs_{player_name}.log")
+        self.logger = Logger(f"client_server_.log")
 
     def connect(self, port):
         self.socket.connect(port)

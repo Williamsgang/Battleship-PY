@@ -1,10 +1,11 @@
 # server/gui.py
 # GUI for the Battleship server.
 
+import threading
 import tkinter as tk
 from tkinter import scrolledtext, messagebox
 from .server import BattleshipServer
-from .settings import SettingsPanel
+from client.settings import SettingsPanel
 
 class BattleshipServerGUI:
     def __init__(self, master):

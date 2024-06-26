@@ -14,7 +14,7 @@ class BattleshipClientGUI:
         self.board_frame = tk.Frame(self.root)
         self.board_frame.pack(padx=10, pady=10)
 
-        self.board_buttons = [[tk.Button(self.board_frame, text="~", width=2, height=1,
+        self.board_buttons = [[tk.Button(self.board_frame, text="X", width=2, height=1,
                                          command=lambda x=i, y=j: self.attack(x, y))
                                for j in range(10)] for i in range(10)]
 

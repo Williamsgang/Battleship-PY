@@ -3,28 +3,50 @@
 
 import logging
 
-
-class Logger:
+class ServerLogger:
     def __init__(self, log_file):
-        self.logger = logging.getLogger('BattleshipServer')
-        self.logger.setLevel(logging.DEBUG)
-        fh = logging.FileHandler(log_file)
-        fh.setLevel(logging.DEBUG)
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        fh.setFormatter(formatter)
-        ch.setFormatter(formatter)
-        self.logger.addHandler(fh)
-        self.logger.addHandler(ch)
+        self.loggers = {}
 
-    def log_info(self, message):
-        self.logger.info(message)
+        self.log_file = log_file
+        self.setup_logger('BattleshipServer')
+        self.setup_logger('Network')
+        self.setup_logger('PlayerManager')
+        self.setup_logger('BattleshipServerGUI')
+        self.setup_logger('GameLogic')
 
-    def log_error(self, message):
-        self.logger.error(message)
+    def setup_logger(self, name):
+        logger = logging.getLogger(name)
+        logger.setLevel(logging.DEBUG)
+        
+        if not logger.handlers:
+            fh = logging.FileHandler(self.log_file)
+            fh.setLevel(logging.DEBUG)
+            ch = logging.StreamHandler()
+            ch.setLevel(logging.DEBUG)
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            fh.setFormatter(formatter)
+            ch.setFormatter(formatter)
+            logger.addHandler(fh)
+            logger.addHandler(ch)
+        
+        self.loggers[name] = logger
 
-    def log_warning(self, message):
-        self.logger.warning(message)
+    def get_logger(self, name):
+        return self.loggers.get(name, None)
+
+    def log_info(self, name, message):
+        logger = self.get_logger(name)
+        if logger:
+            logger.info(message)
+
+    def log_error(self, name, message):
+        logger = self.get_logger(name)
+        if logger:
+            logger.error(message)
+
+    def log_warning(self, name, message):
+        logger = self.get_logger(name)
+        if logger:
+            logger.warning(message)
 
     # TODO: Add methods for logging various events and actions.

@@ -16,5 +16,6 @@ def start_client():
     root.mainloop()
 
 if __name__ == "__main__":
+    
     # TODO: Add code to choose between starting a server or a client.
-    start_server()  # or start_client()
+    start_client()  # or start_client()
