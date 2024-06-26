@@ -19,6 +19,7 @@ A networked Battleship game with a graphical interface, animations, and user sta
   - `animations.py`: Client-side animations
   - `settings.py`: Client-side settings panel
   - `network.py`: Client-side network communication
+  - `socket development`: "https://realpython.com/python-sockets/"
   - `player.py`: Client-side player information
   - `logger.py`: Client-side logging
 - `server/`: Server-side code

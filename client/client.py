@@ -19,7 +19,7 @@ class BattleshipClient:
         self.logger = Logger(f"client_logs_{player_name}.log")
 
     def start(self):
-        self.logger.log("Client started.")
+        self.logger.log_info("Client started.")
         self.gui.start()
 
     # TODO: Add methods for handling network communication, game logic, etc.

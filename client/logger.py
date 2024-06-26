@@ -3,6 +3,7 @@
 
 import logging
 
+
 class Logger:
     def __init__(self, log_file):
         self.logger = logging.getLogger('BattleshipClient')
@@ -17,7 +18,13 @@ class Logger:
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
 
-    def log(self, message):
+    def log_info(self, message):
         self.logger.info(message)
+
+    def log_error(self, message):
+        self.logger.error(message)
+
+    def log_warning(self, message):
+        self.logger.warning(message)
 
     # TODO: Add methods for logging various events and actions.

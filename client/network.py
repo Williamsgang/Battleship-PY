@@ -3,16 +3,21 @@
 
 import socket
 import pickle
+from logger import Logger
+
 
 class Network:
     def __init__(self, host, port):
         self.host = host
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.logger = Logger(f"client_server_logs_{player_name}.log")
 
-    def connect(self):
+    def connect(self, port):
+        self.socket.connect(port)
+        self.logger.log_info(f"Connect to port: {port}")
         # TODO: Implement connection to the server.
-        pass
+
 
     def send(self, data):
         # TODO: Implement sending data to the server.
