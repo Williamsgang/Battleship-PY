@@ -1,0 +1,20 @@
+{
+    "server": {
+        "host": "0.0.0.0",
+        "port": 65432
+    },
+    "client": {
+        "default_server_ip": "127.0.0.1",
+        "port": 65432
+    },
+    "game": {
+        "board_size": 10,
+        "ships": [
+            {"name": "Carrier", "size": 5},
+            {"name": "Battleship", "size": 4},
+            {"name": "Cruiser", "size": 3},
+            {"name": "Submarine", "size": 3},
+            {"name": "Destroyer", "size": 2}
+        ]
+    }
+}
