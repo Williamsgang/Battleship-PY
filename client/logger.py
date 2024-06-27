@@ -4,9 +4,9 @@
 import logging
 import os
 
+
 class ClientLogger:
     def __init__(self, log_file):
-        
         self.loggers = {}
 
         self.log_file = log_file
@@ -19,7 +19,6 @@ class ClientLogger:
     def setup_logger(self, name):
         pwd = os.getcwd()
         cwd = os.path.join(pwd, 'logs')
-        self.loggers('ClientLogger', f'Current working directory is: {cwd}')
         print(f'Current working directory is: {cwd}')
 
         if not cwd:

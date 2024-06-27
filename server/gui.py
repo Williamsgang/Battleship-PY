@@ -16,6 +16,7 @@ class BattleshipServerGUI:
         self.logger_name_reference = 'BattleshipServerGUI'
         self.logger = ServerLogger(self.logger_name_reference)
         self.logger.log_info(self.logger_name_reference, "Logger initialized.")
+
         self.server = server
         pygame.init()
 
@@ -28,6 +29,7 @@ class BattleshipServerGUI:
 
         self.text_area = pygame.Rect(50, 50, 500, 400)
         self.text_area_content = []
+
         self.set_icon(images.battleship_icon)
 
         self.buttons = [

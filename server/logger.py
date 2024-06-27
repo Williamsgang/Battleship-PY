@@ -4,6 +4,7 @@
 import logging
 import os
 
+
 class ServerLogger:
     def __init__(self, log_file):
         self.loggers = {}
@@ -16,6 +17,12 @@ class ServerLogger:
         self.setup_logger('GameLogic')
 
     def setup_logger(self, name):
+        pwd = os.getcwd()
+        cwd = os.path.join(pwd, 'logs')
+        print(f'Current working directory is: {cwd}')
+
+        if not cwd:
+            os.makedirs(cwd)
         logger = logging.getLogger(name)
         logger.setLevel(logging.DEBUG)
         

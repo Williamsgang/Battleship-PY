@@ -15,3 +15,5 @@
 2024-06-26 14:36:47,298 - BattleshipServerGUI - INFO - Logger initialized.
 2024-06-26 14:36:47,456 - BattleshipServer - INFO - Server started.
 2024-06-26 14:36:47,459 - BattleshipServer - ERROR - Error occurred: [WinError 10049] The requested address is not valid in its context
+2024-06-26 18:13:04,526 - BattleshipServerGUI - INFO - Logger initialized.
+2024-06-26 18:13:04,749 - BattleshipServer - INFO - Server started.

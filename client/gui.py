@@ -4,21 +4,31 @@
 import pygame
 import pygame.freetype
 
+from .logger import ClientLogger
 from .animations import AnimationManager
+from assets.images import images
 
 
 class BattleshipClientGUI:
     def __init__(self, client):
+        self.logger_name_reference = 'BattleshipClientGUI'
+        self.logger = ClientLogger(self.logger_name_reference)
+        self.logger.log_info(self.logger_name_reference, "Logger initialized.")
+
         self.client = client
         pygame.init()
+
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption("Battleship Client")
 
         self.font = pygame.freetype.SysFont(None, 24)
         self.running = True
+
         self.board_size = 10
         self.cell_size = 40
         self.margin = 5
+
+        self.set_icon(images.battleship_icon)
 
         self.board_buttons = [[pygame.Rect(j * (self.cell_size + self.margin) + 100,
                                            i * (self.cell_size + self.margin) + 100,
@@ -83,6 +93,17 @@ class BattleshipClientGUI:
             pygame.display.flip()
 
         pygame.quit()
+
+    # Allows for change of icons on the GUI
+    def set_icon(self, icon_path):
+        try:
+            icon = pygame.image.load(icon_path)
+            pygame.display.set_icon(icon)
+            # self.log_message(f'Icon is set to {icon}')
+            self.logger.log_info(self.logger_name_reference + '.set_icon', f'Icon is set to {icon}')
+        except pygame.error as e:
+            print(f'Could not load icon: {e}')
+            self.logger.log_error(self.logger_name_reference + '.set_icon', f'Icon was unable to be loaded')
 
     def draw_board(self):
         for i in range(self.board_size):
