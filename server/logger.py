@@ -2,6 +2,7 @@
 # Logger for the Battleship server.
 
 import logging
+import os
 
 class ServerLogger:
     def __init__(self, log_file):

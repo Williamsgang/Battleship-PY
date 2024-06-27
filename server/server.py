@@ -12,7 +12,7 @@ from .logger import ServerLogger
 
 class BattleshipServer:
 
-    HOST = "127.0.0.0"
+    HOST = ''
     PORT = 65432
 
     def __init__(self, host=HOST, port=PORT):
@@ -32,7 +32,7 @@ class BattleshipServer:
                 s.listen()
                 conn, addr = s.accept()
                 with conn:
-                    self.logger.log_info(f"Connected by {addr}")
+                    self.logger.log_info('BattleshipServer', f"Connected by {addr}")
                     while True:
                         data = conn.recv(1024)
                         if not data:

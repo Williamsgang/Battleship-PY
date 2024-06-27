@@ -1,0 +1,1 @@
+battleship_icon = "assets/images/Battleship Icon.png"

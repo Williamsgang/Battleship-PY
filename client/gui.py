@@ -1,44 +1,36 @@
 # client/gui.py
-# GUI for the Battleship client.
+# GUI for the Battleship client using pygame.
 
-import tkinter as tk
-from tkinter import messagebox
+import pygame
+import pygame.freetype
+
 from .animations import AnimationManager
-from .settings import SettingsPanel
+
 
 class BattleshipClientGUI:
     def __init__(self, client):
         self.client = client
-        self.root = tk.Tk()
-        self.root.title("Battleship Client")
-        self.board_frame = tk.Frame(self.root)
-        self.board_frame.pack(padx=10, pady=10)
+        pygame.init()
+        self.screen = pygame.display.set_mode((800, 600))
+        pygame.display.set_caption("Battleship Client")
 
-        self.board_buttons = [[tk.Button(self.board_frame, text="X", width=2, height=1,
-                                         command=lambda x=i, y=j: self.attack(x, y))
-                               for j in range(10)] for i in range(10)]
+        self.font = pygame.freetype.SysFont(None, 24)
+        self.running = True
+        self.board_size = 10
+        self.cell_size = 40
+        self.margin = 5
 
-        for i in range(10):
-            for j in range(10):
-                self.board_buttons[i][j].grid(row=i, column=j)
+        self.board_buttons = [[pygame.Rect(j * (self.cell_size + self.margin) + 100,
+                                           i * (self.cell_size + self.margin) + 100,
+                                           self.cell_size, self.cell_size)
+                               for j in range(self.board_size)] for i in range(self.board_size)]
 
-        self.server_ip_label = tk.Label(self.root, text="Server IP:")
-        self.server_ip_label.pack(pady=5)
-
-        self.server_ip_entry = tk.Entry(self.root)
-        self.server_ip_entry.pack(pady=5)
-
-        self.connect_button = tk.Button(self.root, text="Connect", command=self.connect_to_server)
-        self.connect_button.pack(pady=5)
-
-        self.stats_button = tk.Button(self.root, text="Show Stats", command=self.request_stats)
-        self.stats_button.pack(pady=5)
-
-        self.settings_button = tk.Button(self.root, text="Settings", command=self.open_settings)
-        self.settings_button.pack(pady=5)
-
-        self.quit_button = tk.Button(self.root, text="Quit Game", command=self.root.quit)
-        self.quit_button.pack(pady=5)
+        self.buttons = [
+            ("Connect", pygame.Rect(600, 100, 150, 40), self.connect_to_server),
+            ("Show Stats", pygame.Rect(600, 150, 150, 40), self.request_stats),
+            ("Settings", pygame.Rect(600, 200, 150, 40), self.open_settings),
+            ("Quit Game", pygame.Rect(600, 250, 150, 40), self.quit_game)
+        ]
 
         self.animation_manager = AnimationManager(self)
 
@@ -55,14 +47,57 @@ class BattleshipClientGUI:
         pass
 
     def log_message(self, message):
-        messagebox.showinfo("Game Info", message)
+        # Display a message on the screen (for simplicity)
+        print(f"Game Info: {message}")
 
     def request_stats(self):
         # TODO: Request statistics from the server.
         pass
 
     def open_settings(self):
-        SettingsPanel(self.root)
+        # TODO: Open settings window
+        pass
 
-    def start(self):
-        self.root.mainloop()
+    def quit_game(self):
+        self.running = False
+
+    def run(self):
+        while self.running:
+            self.screen.fill((0, 0, 128))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = event.pos
+                    for label, rect, callback in self.buttons:
+                        if rect.collidepoint(mouse_pos):
+                            callback()
+                    for i in range(self.board_size):
+                        for j in range(self.board_size):
+                            if self.board_buttons[i][j].collidepoint(mouse_pos):
+                                self.attack(i, j)
+
+            self.draw_board()
+            self.draw_buttons()
+            pygame.display.flip()
+
+        pygame.quit()
+
+    def draw_board(self):
+        for i in range(self.board_size):
+            for j in range(self.board_size):
+                pygame.draw.rect(self.screen, (0, 0, 0), self.board_buttons[i][j], 2)
+                self.font.render_to(self.screen, (self.board_buttons[i][j].x + 10, self.board_buttons[i][j].y + 10),
+                                    "X", (255, 255, 255))
+
+    def draw_buttons(self):
+        for label, rect, _ in self.buttons:
+            pygame.draw.rect(self.screen, (0, 0, 0), rect, 2)
+            self.font.render_to(self.screen, (rect.x + 10, rect.y + 10), label, (255, 255, 255))
+
+
+if __name__ == "__main__":
+    client = None  # Replace with actual client object
+    gui = BattleshipClientGUI(client)
+    gui.run()
