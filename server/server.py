@@ -2,55 +2,59 @@
 # Main server logic for the Battleship game.
 
 import socket
-import threading
-import pickle
-from .network import Network
-from .game_logic import GameLogic
-from .player import PlayerManager
-from .logger import ServerLogger
+
+from logs import logger
+from networking import network
 
 
 class BattleshipServer:
+    def __init__(self):
+        self.running = True
+        self.host = "127.0.0.1"
+        self.port = 65432
+        self.log = logger.Logger(self.__class__.__name__)
+        self.net = network.Network(self.host, self.port, is_server=True)
+        self.log.log_info('__init__', 'Server initialized')
+        # TODO: Add methods for handling game logic, client communication, etc.
 
-    HOST = ''
-    PORT = 65432
+    def start_server(self):
+        self.log.log_info('start_server', 'Starting server...')
+        self.net.accept_conn()
+        print(f'Server started on {self.host}:{self.port}')
+        self.log.log_info('start_server', f'Server started on {self.host}:{self.port}')
 
-    def __init__(self, host=HOST, port=PORT):
-        self.network = Network(host, port)
-        self.game_logic = GameLogic(self)
-        self.player_manager = PlayerManager()
-        self.logger = ServerLogger("server_logs.log")
-        self.clients = []
-
-    def start(self):
-        self.logger.log_info('BattleshipServer', 'Server started.')
-
-        try:
-            self.network.start_server(self.handle_client)
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.bind((self.host, self.port))
-                s.listen()
-                conn, addr = s.accept()
-                with conn:
-                    self.logger.log_info('BattleshipServer', f"Connected by {addr}")
-                    while True:
-                        data = conn.recv(1024)
-                        if not data:
+        while self.running:
+            try:
+                conn, addr = self.net.accept_conn()
+                if conn is None:
+                    self.log.log_warning('start_server', 'No connection accepted')
+                    break
+                print(f'Connected by {addr}')
+                self.log.log_info('start_server', f'Connected by {addr}')
+                while self.running:
+                    try:
+                        data = self.net.receive_data(conn)
+                        if data:
+                            print(f'Received data: {data}')
+                            self.log.log_info('start_server', f'Received data: {data}')
+                        else:
+                            self.log.log_warning('start_server', 'No data received, connection might be closed')
                             break
-                        conn.sendall(data)
-        except Exception as e:
-            self.logger.log_error('BattleshipServer', f"Error occurred: {e}")
+                    except socket.error as se:
+                        self.log.log_error('start_server', f'Socket error on receive: {se}')
+                        break
+            except socket.error as se:
+                self.log.log_error('start_server', f'Socket error on accept: {se}')
+                self.running = False
 
-    def handle_client(self, client_socket):
-        # TODO: Implement client handling logic.
-        NotImplementedError
+    def stop_server(self):
+        self.log.log_info('stop_server', 'Stopping server...')
+        self.net.disconnect()
+        self.running = False
+        self.log.log_info('stop_server', 'Server stopped')
 
-    def set_admin(self):
-        pass
-
-    # TODO: Add methods for handling game logic, client communication, etc.
 
 
 if __name__ == "__main__":
     server = BattleshipServer()
-    server.start()
+    server.start_server()

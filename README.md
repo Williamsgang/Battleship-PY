@@ -29,6 +29,8 @@ A networked Battleship game with a graphical interface, animations, and user sta
   - `player.py`: Server-side player information management
   - `logger.py`: Server-side logging
   - `gui.py`: Server GUI
+  - `ships.py`: Ship and plane logic
+  - `events.py`: Event handler for longevity
 - `config/`: Configuration files
   - `settings.json`: Game and network settings
 - `main.py`: Entry point for the game
