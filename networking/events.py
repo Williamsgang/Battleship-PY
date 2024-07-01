@@ -3,7 +3,11 @@
 import socket
 
 from logs import logger
-from shared import board, ships
+from server import server
+from shared import ships
+from shared import board
+from shared.board import Board
+from shared.ships import Ships
 
 
 class Events:
@@ -15,16 +19,30 @@ class Events:
     def board_create_event(self):
         board_instance = self.board
         board = board_instance.create_board()
-        self.log.log_info('board_create_event', f'Board created')
+        self.log.log_info('board_create_event', 'Board created')
         return board
 
     def ships_create_event(self):
         ships_instance = self.ships
-        self.log.log_info('ships_create_event', f'Ships created')
+        self.log.log_info('ships_create_event', 'Ships created')
         return ships_instance
 
     def game_board_event(self):
-        return NotImplementedError
+        board_instance = Board()
+        ship_instance = Ships()
+
+        board = board_instance.create_board()
+        board_instance.place_ships()
+        self.log.log_info('game_board_event', 'Game board created and ships placed')
+        return board
+
+    def board_validation(self, server_board, client_board):
+        if server_board.board == client_board.board:
+            self.log.log_info('board_validation', 'Boards are synchronized and valid.')
+            print("Boards are synchronized and valid.")
+        else:
+            self.log.log_warning('board_validation', 'Boards are not synchronized. Potential cheating detected!')
+            print("Boards are not synchronized. Potential cheating detected!")
 
 
 class EventHandler:
@@ -34,25 +52,63 @@ class EventHandler:
         self.client_address = None
 
     def handle_event(self, event, server):
-        # TODO: Implement this
-        pass
+        self.log.log_info('handle_event', f'Handling event: {event}')
+        if event == 'connection':
+            self.handle_connection(event, server)
+        elif event == 'disconnection':
+            self.handle_disconnection(event, server)
+        elif event == 'socket_error':
+            self.handle_socket_error_event(event)
+        elif event == 'server_close':
+            self.handle_server_close_event()
+        elif event == 'game_start':
+            self.game_start()
+        else:
+            self.log.log_warning('handle_event', f'Unhandled event type: {event}')
 
     def handle_connection(self, event, server):
-        # Handle new connection
-        self.log.log_info('handle_connection', f'New connection from {event.client_address}')
-        # TODO: Add connection logic here
+        self.log.log_info('handle_connection', 'New connection established')
+        self.server_address = server.server_address
+        self.client_address = server.client_address
+        self.log.log_info('handle_connection', f'Server address: {self.server_address}, Client address: {self.client_address}')
+        # Send acknowledgment to client
+        try:
+            server.conn.sendall(b'Connection established')
+            self.log.log_info('handle_connection', 'Acknowledgment sent to client')
+        except socket.error as se:
+            self.log.log_error('handle_connection', f'Error sending acknowledgment: {se}')
 
     def handle_disconnection(self, event, server):
-        # Handle disconnection
-        self.log.log_info('handle_disconnection', f'Client disconnected: {event.client_address}')
-        # TODO: Add disconnection logic here
+        self.log.log_info('handle_disconnection', 'Client disconnected')
+        self.server_address = None
+        self.client_address = None
+        server.conn.close()
+        self.log.log_info('handle_disconnection', 'Connection closed')
 
-    def handle_socket_error_event(self):
-        # Handle socket disconnection
-        self.log.log_info('handle_socked_error_event', f'Connection failed due to a socket error {socket.error}')
-        # TODO: Add disconnection logic here
+    def handle_socket_error_event(self, error):
+        self.log.log_error('handle_socket_error_event', f'Socket error: {error}')
+        # Implement socket error handling logic here
+        try:
+            # Attempt to close the connection
+            error.conn.close()
+        except socket.error as se:
+            self.log.log_error('handle_socket_error_event', f'Error closing socket: {se}')
+
+    def handle_server_close_event(self):
+        self.log.log_info('handle_server_close_event', 'Server has shut down')
+        # Implement server shutdown handling logic here
+        try:
+            # Attempt to close the server socket
+            pass
+        except socket.error as se:
+            self.log.log_error('handle_server_close_event', f'Error closing server socket: {se}')
 
     def game_start(self):
+        self.log.log_info('game_start', 'Starting game...')
         events = Events()
-
         board = events.board_create_event()
+        ships = events.ships_create_event()
+        game_board = events.game_board_event()
+        self.log.log_info('game_start', 'Game board and ships created')
+        # Implement further game start logic
+

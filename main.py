@@ -6,7 +6,7 @@ import keyboard
 import threading
 import signal
 
-from client.client import BattleshipClient
+from client import BattleshipClient
 from server.server import BattleshipServer
 
 shutdown_event = threading.Event()
