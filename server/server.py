@@ -3,6 +3,9 @@
 import pickle
 import socket
 
+import pygame
+
+import assets.images.images
 from logs import logger
 from networking import network
 from shared import board, ships
@@ -41,6 +44,7 @@ class BattleshipServer:
 
                 # Send the game state to the client
                 game_state = {
+                    'board_size': self.board.board_size,
                     'board': self.board.board,
                     'ships': self.ships.ships
                 }

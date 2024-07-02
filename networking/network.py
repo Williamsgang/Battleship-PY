@@ -35,8 +35,9 @@ class Network:
         if not self.is_server:
             raise RuntimeError("accept_conn can only be called on server instances")
         try:
-            self.log.log_info('accept_conn', f'Accepted connection from {self.s.accept}')
-            return self.s.accept()
+            conn, addr = self.s.accept()
+            self.log.log_info('accept_conn', f'Accepted connection from {addr}')
+            return conn, addr
         except socket.error as se:
             self.log.log_error('accept_conn', f'Socket error on accept: {se}')
             return None, None
@@ -75,3 +76,9 @@ class Network:
         except socket.error as se:
             self.log.log_error('receive_data', f'Socket error: {se}')
             return None
+
+    def is_server_running(self):
+        if self.s:
+            self.log.log_info('is_server_running', f'There is no server up at the moment')
+        else:
+            self.log.log_info('is_server_running', f'Server is up and running on {self.host_port}')

@@ -32,3 +32,15 @@ def get_server_host():
 def get_server_port():
     settings = load_settings()
     return settings['server']['port']
+
+def get_board_size():
+    settings = load_settings()
+    return settings['game']['board_size']
+
+def get_ships():
+    settings = load_settings()
+    return settings['game']['ships']
+
+def get_ship_sizes():
+    settings = load_settings()
+    return settings['game']['ships']['size']

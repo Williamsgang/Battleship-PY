@@ -3,9 +3,8 @@
 import socket
 
 from logs import logger
-from server import server
-from shared import ships
 from shared import board
+from shared import ships
 from shared.board import Board
 from shared.ships import Ships
 
@@ -70,7 +69,8 @@ class EventHandler:
         self.log.log_info('handle_connection', 'New connection established')
         self.server_address = server.server_address
         self.client_address = server.client_address
-        self.log.log_info('handle_connection', f'Server address: {self.server_address}, Client address: {self.client_address}')
+        self.log.log_info('handle_connection',
+                          f'Server address: {self.server_address}, Client address: {self.client_address}')
         # Send acknowledgment to client
         try:
             server.conn.sendall(b'Connection established')
@@ -112,3 +112,18 @@ class EventHandler:
         self.log.log_info('game_start', 'Game board and ships created')
         # Implement further game start logic
 
+    def handle_receive_data(self, client, received_data):
+        if received_data:
+            self.log.log_info('handle_receive_data', f'Information received: {received_data}')
+            print(f'Received data from the server: {received_data}')
+        else:
+            self.log.log_warning('handle_receive_data', 'No data received, connection might be closed')
+            client.running = False
+
+    def handle_send_data(self, client, data):
+        try:
+            client.net.send_data(client.s, data)
+            self.log.log_info('handle_send_data', f'Sent data to server: {data}')
+        except socket.error as se:
+            self.log.log_error('handle_send_data', f'Socket error on send: {se}')
+            client.running = False
