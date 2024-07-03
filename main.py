@@ -6,7 +6,7 @@ import keyboard
 import threading
 import signal
 
-from client import client
+from client.client import BattleshipClient
 from server.server import BattleshipServer
 
 shutdown_event = threading.Event()
@@ -61,7 +61,7 @@ def start_client():
     keypress_thread = threading.Thread(target=listen_for_keypress)
     keypress_thread.start()
 
-    client = client.BattleshipClient()
+    client = BattleshipClient()
     client.net.connect()
     # TODO: Add functionality to this
 

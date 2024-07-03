@@ -9,7 +9,7 @@ from logs import logger
 from networking import network
 from networking.events import EventHandler
 from shared.board_ships_players import Board, Ships
-from screens.client_gui import GUI
+from screens.client_gui import ClientGUI
 
 
 class BattleshipClient:
@@ -72,7 +72,7 @@ class BattleshipClient:
 
     def gui_setup(self):
         self.log.log_info('gui_setup', 'Setting up GUI...')
-        gui = GUI()
+        gui = ClientGUI()
         gui.main_loop()
 
 

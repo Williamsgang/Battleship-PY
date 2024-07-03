@@ -91,6 +91,9 @@ class BattleshipServer:
         conn.close()
         self.log.log_info('handle_client', f'Connection closed with {addr}')
 
+    def game(self, client, player_info):
+        pass
+
 
 if __name__ == "__main__":
     server = BattleshipServer()

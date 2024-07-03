@@ -2,7 +2,7 @@
 
 import pygame
 
-from .screens import Screens
+from screens import Screens
 
 
 class GameGUI(Screens):
