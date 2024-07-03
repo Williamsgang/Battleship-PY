@@ -2,7 +2,7 @@
 # Network communication for the Battleship server.
 
 import socket
-from typing import Tuple
+from typing import Tuple, List
 
 from logs import logger
 
@@ -14,6 +14,12 @@ class Network:
         self.log = logger.Logger(self.__class__.__name__)
         self.log.log_info('__init__', f'Logger initialized on {self.__class__.__name__}')
         self.s = None
+        self.connections = []
+        self.num_clients = 0
+        self.client_info = {
+            'name': f'',
+            'ip': f''
+        }
 
         if is_server:
             self.setup_server()
@@ -25,21 +31,26 @@ class Network:
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.bind(self.host_port)
         self.s.listen(5)
-        self.log.log_info('setup_server', f'Server listening on {self.host_port[0]}:{self.host_port[1]}')
+        self.log.log_info('setup_server',
+                          f'Server listening on {self.host_port[0]}:{self.host_port[1]}')
 
     def setup_client(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.log.log_info('setup_client', 'Client socket setup complete')
+        self.log.log_info('setup_client',
+                          'Client socket setup complete')
 
     def accept_conn(self):
         if not self.is_server:
             raise RuntimeError("accept_conn can only be called on server instances")
         try:
             conn, addr = self.s.accept()
-            self.log.log_info('accept_conn', f'Accepted connection from {addr}')
+            self.log.log_info('accept_conn',
+                              f'Accepted connection from {addr}')
+            self.num_clients += 1
             return conn, addr
         except socket.error as se:
-            self.log.log_error('accept_conn', f'Socket error on accept: {se}')
+            self.log.log_error('accept_conn',
+                               f'Socket error on accept: {se}')
             return None, None
 
     def connect(self):
@@ -47,38 +58,54 @@ class Network:
             raise RuntimeError("connect can only be called on client instances")
         try:
             self.s.connect(self.host_port)
-            self.log.log_info('connect', f'Connected to server at {self.host_port[0]}:{self.host_port[1]}')
+            self.log.log_info('connect',
+                              f'Connected to server at {self.host_port[0]}:{self.host_port[1]}')
             return self.s
         except socket.error as se:
-            self.log.log_error('connect', f'Socket error: {se}')
+            self.log.log_error('connect',
+                               f'Socket error: {se}')
             return None
 
     def disconnect(self):
         if self.s:
             try:
                 self.s.close()
-                self.log.log_info('disconnect', 'Socket closed')
+                self.log.log_info('disconnect',
+                                  'Socket closed')
+                self.num_clients -= 1
             except socket.error as se:
-                self.log.log_error('disconnect', f'Socket error: {se}')
+                self.log.log_error('disconnect',
+                                   f'Socket error: {se}')
 
     def send_data(self, conn, data):
         try:
             conn.sendall(data)
-            self.log.log_info('send_data', 'Data sent successfully')
+            self.log.log_info('send_data',
+                              'Data sent successfully')
         except socket.error as se:
-            self.log.log_error('send_data', f'Socket error: {se}')
+            self.log.log_error('send_data',
+                               f'Socket error: {se}')
 
     def receive_data(self, conn):
         try:
             data = conn.recv(4096)
-            self.log.log_info('receive_data', 'Data received successfully')
+            self.log.log_info('receive_data',
+                              'Data received successfully')
             return data
         except socket.error as se:
-            self.log.log_error('receive_data', f'Socket error: {se}')
+            self.log.log_error('receive_data',
+                               f'Socket error: {se}')
             return None
 
     def is_server_running(self):
         if self.s:
-            self.log.log_info('is_server_running', f'There is no server up at the moment')
+            self.log.log_info('is_server_running',
+                              f'There is no server up at the moment')
         else:
-            self.log.log_info('is_server_running', f'Server is up and running on {self.host_port}')
+            self.log.log_info('is_server_running',
+                              f'Server is up and running on {self.host_port}')
+
+    def get_connections(self) -> List[Tuple[socket.socket, Tuple[str, int]]]:
+        self.log.log_info('get_connections',
+                          f'Retrieving list of active connections. Total connections: {len(self.connections)}')
+        return self.connections

@@ -12,7 +12,7 @@ from shared.board_ships_players import Board, Ships
 from screens.client_gui import GUI
 
 
-class BattleshipClient:
+class BattleshipClient1:
     def __init__(self):
         self.log = logger.Logger(self.__class__.__name__)
         self.running = False
@@ -23,7 +23,6 @@ class BattleshipClient:
         self.board = None
         self.ships = None
         self.event_handler = EventHandler()
-        self.username = None
         self.log.log_info('__init__', 'Client initialized')
 
     def start_client(self):

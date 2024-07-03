@@ -1,9 +1,5 @@
-# shared/board_ships_players.py
-# Initialization of the board, ships, and players
-
 import random
-from typing import Tuple
-
+from typing import Tuple, List
 import config.settings
 from logs import logger
 
@@ -12,35 +8,28 @@ game_settings = config.settings.load_settings()
 
 class Ship:
     def __init__(self, name, size):
-        self.log = logger.Logger(self.__class__.__name__)
         self.name = name
         self.size = size
         self.row = random.randrange(0, game_settings['game']['board_size'])
         self.col = random.randrange(0, game_settings['game']['board_size'])
         self.orientation = random.choice(['horizontal', 'vertical'])
         self.indexes = self.compute_indexes()
-        self.log.log_info('__init__',
-                          f'{self.name} initialized with size {self.size}, position ({self.row}, {self.col}), orientation {self.orientation}')
 
     def compute_indexes(self):
         indexes = []
         for i in range(self.size):
             if self.orientation == 'horizontal':
                 if self.col + i >= game_settings['game']['board_size']:  # Prevent horizontal overflow
-                    self.log.log_warning('compute_indexes', 'Horizontal overflow prevented')
                     return []
                 indexes.append((self.row, self.col + i))
             elif self.orientation == 'vertical':
                 if self.row + i >= game_settings['game']['board_size']:  # Prevent vertical overflow
-                    self.log.log_warning('compute_indexes', 'Vertical overflow prevented')
                     return []
                 indexes.append((self.row + i, self.col))
-        self.log.log_info('compute_indexes', f'Indexes computed for {self.name}: {indexes}')
         return indexes
 
     def place_ship(self, positions):
         self.indexes = positions
-        self.log.log_info('place_ship', f'{self.name} placed at positions {positions}')
 
 
 class Ships:
@@ -80,10 +69,8 @@ class Board:
     def is_valid_position(self, positions):
         for (row, col) in positions:
             if row < 0 or row >= self.board_size[0] or col < 0 or col >= self.board_size[1]:
-                self.log.log_warning('is_valid_position', f'Position out of bounds: ({row}, {col})')
                 return False
             if self.board[row][col] != "0":
-                self.log.log_warning('is_valid_position', f'Position already occupied: ({row}, {col})')
                 return False
         return True
 
@@ -104,7 +91,7 @@ class Board:
                 if self.is_valid_position(positions):
                     break
                 else:
-                    self.log.log_warning('place_ships', f'Invalid position for placing {ship.name} at ({row}, {col})')
+                    self.log.log_warning('place_ships', f'Invalid position for placing {ship.name}.')
 
             for (r, c) in positions:
                 if ship.name == 'Carrier':
@@ -121,14 +108,14 @@ class Board:
                     self.log.log_error('place_ships', f'Invalid ship name: {ship.name}')
                     return
 
-            self.log.log_info('place_ships',
-                              f'Ship, {ship.name}, placed at positions: {positions}, with an orientation of: {orientation}')
+            self.log.log_info('place_ships', f'Ship, {ship.name}, placed at positions: {positions}, '
+                                             f'with an orientation of: {orientation}')
             ship.place_ship(positions)
 
     def display_board(self):
         for row in self.board:
             print(" ".join(row))
-        self.log.log_info('display_board', 'Board displayed in the console')
+        self.log.log_info('display_board', f'Board displayed in the console.')
 
 
 class Players:
@@ -143,25 +130,12 @@ class Players:
         board = Board()
         board.place_ships(self.ships)
         self.log.log_info('place_ships', 'Ships placed for the player')
-        self.board = board
 
     def show_ships(self):
-        display_board = [['-' for _ in range(game_settings['game']['board_size'])] for _ in
-                         range(game_settings['game']['board_size'])]
+        board = [['-' for _ in range(game_settings['game']['board_size'])] for _ in range(game_settings['game']['board_size'])]
         for ship in self.ships.values():
             for (row, col) in ship.indexes:
-                display_board[row][col] = 'X'
-        for row in display_board:
+                board[row][col] = 'X'
+        for row in board:
             print(' '.join(row))
         self.log.log_info('show_ships', 'Player ships displayed')
-
-
-if __name__ == "__main__":
-    player = Players()
-    player1 = Players()
-
-    player.show_ships()
-
-    print()
-
-    player1.show_ships()

@@ -3,17 +3,15 @@
 import socket
 
 from logs import logger
-from shared import board
-from shared import ships
-from shared.board import Board
-from shared.ships import Ships
+from shared import board_ships_players
 
 
 class Events:
     def __init__(self):
         self.log = logger.Logger(self.__class__.__name__)
-        self.board = board.Board()
-        self.ships = ships.Ships()
+        self.board = board_ships_players.Board()
+        self.ships = board_ships_players.Ships()
+        self.players = board_ships_players.Players()
 
     def board_create_event(self):
         board_instance = self.board
@@ -22,26 +20,28 @@ class Events:
         return board
 
     def ships_create_event(self):
-        ships_instance = self.ships
+        ships = self.ships
+        ships.create_ships()
         self.log.log_info('ships_create_event', 'Ships created')
-        return ships_instance
+        return ships
 
     def game_board_event(self):
-        board_instance = Board()
-        ship_instance = Ships()
-
-        board = board_instance.create_board()
-        board_instance.place_ships()
+        board = self.board
+        board.place_ships(self.players.ships)
         self.log.log_info('game_board_event', 'Game board created and ships placed')
         return board
 
-    def board_validation(self, server_board, client_board):
+    def board_validation_event(self, server_board, client_board):
         if server_board.board == client_board.board:
             self.log.log_info('board_validation', 'Boards are synchronized and valid.')
             print("Boards are synchronized and valid.")
         else:
             self.log.log_warning('board_validation', 'Boards are not synchronized. Potential cheating detected!')
             print("Boards are not synchronized. Potential cheating detected!")
+
+    def get_players_event(self):
+        player = board_ships_players.Players()
+        return player
 
 
 class EventHandler:

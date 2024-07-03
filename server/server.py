@@ -8,7 +8,7 @@ import pygame
 import assets.images.images
 from logs import logger
 from networking import network
-from shared import board, ships
+from shared import board_ships_players
 
 
 class BattleshipServer:
@@ -18,12 +18,12 @@ class BattleshipServer:
         self.log = logger.Logger(self.__class__.__name__)
         self.net = network.Network(self.host_port, is_server=True)
         self.log.log_info('__init__', 'Server initialized')
-        self.board = board.Board()
-        self.ships = ships.Ships()
+        self.board = board_ships_players.Board()
+        self.ships = board_ships_players.Ships()
+        self.players = board_ships_players.Players()
         self.board.create_board()
-        self.board.place_ships()
 
-        self.players = []
+        self.players_list = []
 
         # TODO: Add methods for handling game logic, client communication, etc.
 
