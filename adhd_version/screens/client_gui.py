@@ -1,11 +1,10 @@
 import pygame
-from logs import logger
-from networking import network
+from adhd_version.logs import logger
+from adhd_version.networking import network
 from main_menu import MainMenuScreen
 from settings import SettingsGUI
 from game import GameGUI
 from user_info import UserInfoGUI
-from server.player_creation import PlayerCreation
 import pickle
 
 

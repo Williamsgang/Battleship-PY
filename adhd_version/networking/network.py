@@ -1,7 +1,7 @@
 import socket
 import threading
 from typing import Tuple
-from logs import logger
+from adhd_version.logs import logger
 
 
 class Network:

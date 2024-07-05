@@ -1,4 +1,4 @@
-# logs/logger.py
+# logs/log.py
 # Logs all information that goes on
 
 import logging

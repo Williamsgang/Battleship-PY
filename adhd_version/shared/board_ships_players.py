@@ -1,9 +1,10 @@
 import random
-from typing import Tuple, List
-import config.settings
-from logs import logger
+from typing import Tuple
 
-game_settings = config.settings.load_settings()
+import adhd_version
+from adhd_version.logs import logger
+
+game_settings = adhd_version.config.settings.load_settings()
 
 
 class Ship:

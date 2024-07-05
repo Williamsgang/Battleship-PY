@@ -1,6 +1,6 @@
 import pygame
 
-from screens import Screens
+from adhd_version.screens import Screens
 
 
 class MainMenuScreen(Screens):

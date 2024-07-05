@@ -2,9 +2,9 @@
 # Centralized event handling for the Battleship game.
 import socket
 
-from logs import logger
-from server.game_logic import GameLogic
-from shared import board_ships_players
+from adhd_version.logs import logger
+from adhd_version.server.game_logic import GameLogic
+from adhd_version.shared import board_ships_players
 
 
 class Events:

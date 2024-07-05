@@ -2,7 +2,7 @@
 
 import pygame
 
-from screens import Screens
+from adhd_version.screens import Screens
 
 
 class SettingsGUI(Screens):

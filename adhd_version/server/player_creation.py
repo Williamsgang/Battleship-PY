@@ -3,10 +3,9 @@
 
 import json
 import os
-import struct
 import uuid
 from cryptography.fernet import Fernet
-from logs import logger
+from adhd_version.logs import logger
 
 
 class PlayerCreation:

@@ -4,12 +4,12 @@ import pickle
 import socket
 import time
 
-from config import settings
-from logs import logger
-from networking import network
-from networking.events import EventHandler
-from shared.board_ships_players import Board, Ships
-from screens.client_gui import GUI
+from adhd_version.config import settings
+from adhd_version.logs import logger
+from adhd_version.networking import network
+from adhd_version.networking.events import EventHandler
+from adhd_version.shared.board_ships_players import Board, Ships
+from adhd_version.screens.client_gui import GUI
 
 
 class BattleshipClient1:

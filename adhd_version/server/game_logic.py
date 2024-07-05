@@ -1,11 +1,11 @@
 # server/game_logic.py
-from logs import logger
-from shared import board_ships_players
+from adhd_version.logs import logger
+from adhd_version.shared import board_ships_players
 
 
 class GameLogic:
     def __init__(self):
-        # Initialize the logger, board, ships, players, hits, and ships sunk count
+        # Initialize the log, board, ships, players, hits, and ships sunk count
         self.log = logger.Logger(self.__class__.__name__)
         self.log.log_info('__init__', 'Initializing GameLogic')
         self.board = board_ships_players.Board()

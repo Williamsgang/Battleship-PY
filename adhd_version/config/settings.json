@@ -16,9 +16,5 @@
             {"name": "Submarine", "size": 3},
             {"name": "Destroyer", "size": 2}
         ]
-    },
-    "gui": {
-        "tile_size": 45
-
     }
 }

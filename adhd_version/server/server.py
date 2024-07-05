@@ -3,12 +3,9 @@
 import pickle
 import socket
 
-import pygame
-
-import assets.images.images
-from logs import logger
-from networking import network
-from shared import board_ships_players
+from adhd_version.logs import logger
+from adhd_version.networking import network
+from adhd_version.shared import board_ships_players
 
 
 class BattleshipServer:

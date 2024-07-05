@@ -1,9 +1,9 @@
 # screens/user_info.py
 
 import pygame
-from logs import logger
-from screens import Screens
-from server.player_creation import PlayerCreation
+from adhd_version.logs import logger
+from adhd_version.screens import Screens
+from adhd_version.server.player_creation import PlayerCreation
 
 
 class UserInfoGUI(Screens):
