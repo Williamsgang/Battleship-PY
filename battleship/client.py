@@ -1,7 +1,7 @@
 # battleship/client.py
 import asyncio
+import pickle
 
-from battleship import bsp
 from log.logger import Logger
 from networking.network import Network
 
@@ -10,24 +10,55 @@ class Client:
     def __init__(self, client_num):
         self.log = Logger(self.__class__.__name__)
         self.running = True
-        self.player = bsp.Player()
-        self.s = None
         self.net = Network((f'127.0.0.{client_num}', 65433), is_server=False)
+        self.reader = None
+        self.writer = None
 
     async def start_client(self):
-        await self.net.start_client()
+        reader, writer = await self.net.client_connects()
+        if not writer:
+            return
 
-    async def data_transfer(self, data):
-        if self.s:
-            reader, writer = self.s
+        self.reader, self.writer = reader, writer
+        self.log.log_info('start_client', 'Connected to server')
+
+        await asyncio.gather(self.handle_user_input(), self.handle_server_response())
+
+    async def send_command(self, command):
+        self.writer.write(pickle.dumps(command))
+        await self.writer.drain()
+
+    def disconnect(self):
+        self.net.disconnect()
+
+    async def handle_user_input(self):
+        while self.running:
+            command = await asyncio.get_event_loop().run_in_executor(None, input, "Enter command: ")
+            if command.startswith("shoot"):
+                _, x, y = command.split()
+                await self.send_command({"cmd": "shoot", "x": int(x), "y": int(y)})
+            elif command.startswith("show_boards"):
+                _, player = command.split()
+                await self.send_command({"cmd": "show_boards", "player": player.ship_tracker})
+            elif command == "exit":
+                self.running = False
+                self.disconnect()
+            else:
+                print("Unknown command")
+
+    async def handle_server_response(self):
+        while self.running:
             try:
-                received_data = await self.net.data_transfer(reader, writer, data)
-                self.log.log_info('data_transfer', f'Data received: {received_data}')
-                return received_data
-
+                response_data = await self.reader.read(100)
+                if response_data:
+                    response = pickle.loads(response_data)
+                    print(f"Response: {response}")
+                else:
+                    print("Server closed connection")
+                    self.running = False
             except Exception as e:
-                self.log.log_error('data_transfer', f'Transfer error: {e}')
-                return None
+                print(f"Error receiving data: {e}")
+                self.running = False
 
 
 if __name__ == "__main__":
@@ -36,4 +67,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(client.start_client())
     except KeyboardInterrupt:
-        client.running = False
+        client.disconnect()
