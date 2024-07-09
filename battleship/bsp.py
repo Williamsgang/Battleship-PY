@@ -1,11 +1,13 @@
 # battleship/bsp.py
+
+# imports from outside packages
 import random
 from typing import Tuple
+import numpy as np
 
-from adhd_version.logs import logger
+# imports from local packages
 from config import settings
-
-from collections import Counter
+from log import logger
 
 game_settings = settings.load_settings()
 
@@ -52,7 +54,7 @@ class Board:
     def __init__(self):
         self.log = logger.Logger(self.__class__.__name__)
         self.board_size = (game_settings['game']['board_size'], game_settings['game']['board_size'])
-        self.board = self.create_board()
+        self.grid = self.create_board()
 
     def create_board(self, board_size: Tuple[int, int] = None):
         if board_size is None:
@@ -74,7 +76,7 @@ class Board:
         for (row, col) in positions:
             if row < 0 or row >= self.board_size[0] or col < 0 or col >= self.board_size[1]:
                 return False
-            if self.board[row][col] != "0":
+            if self.grid[row][col] != "0":
                 return False
         return True
 
@@ -99,15 +101,15 @@ class Board:
 
             for (r, c) in positions:
                 if ship.name == 'Carrier':
-                    self.board[r][c] = "C"
+                    self.grid[r][c] = "C"
                 elif ship.name == 'Battleship':
-                    self.board[r][c] = "B"
+                    self.grid[r][c] = "B"
                 elif ship.name == 'Cruiser':
-                    self.board[r][c] = "R"
+                    self.grid[r][c] = "R"
                 elif ship.name == 'Submarine':
-                    self.board[r][c] = "S"
+                    self.grid[r][c] = "S"
                 elif ship.name == 'Destroyer':
-                    self.board[r][c] = "D"
+                    self.grid[r][c] = "D"
                 else:
                     self.log.log_error('place_ships', f'Invalid ship name: {ship.name}')
                     return
@@ -117,85 +119,31 @@ class Board:
             ship.place_ship(positions)
 
     def display_board(self):
-        for row in self.board:
+        for row in self.grid:
             print(" ".join(row))
         self.log.log_info('display_board', f'Board displayed in the console.')
 
-    def count_ships(self):
-        board_clone = self.board
-        for row in board_clone:
-            while "0" in row:
-                row.remove("0")
-            while "X" in row:
-                row.remove("X")
-        return board_clone
+    def count_ships(self, player):
+        grid_clone = player.ship_tracker.grid
+
+        values, counts = np.unique(grid_clone, return_counts=True)
+
+        return f'{values, counts}'
 
 
 class Player:
     def __init__(self):
+        # Logger to map issues and log all necessary details
         self.log = logger.Logger(self.__class__.__name__)
 
+        # Ship board that typically the player knows their own ship locations
         self.ships = Ships().ships
-        self.board = Board()
-        self.board.place_ships(self.ships)
+        self.ship_tracker = Board()
+        self.ship_tracker.place_ships(self.ships)
 
-        self.shoot_board = Board()
-
-
-
-    def place_ships(self, ships):
-        for ship in ships.values():
-            while True:
-                row = random.randint(0, self.board.board_size[0] - 1)
-                col = random.randint(0, self.board.board_size[1] - 1)
-                positions = []
-                orientation = random.choice(["horizontal", "vertical"])
-
-                for i in range(ship.size):
-                    if orientation == "horizontal":
-                        positions.append((row, col + i))
-                    elif orientation == "vertical":
-                        positions.append((row + i, col))
-
-                if self.is_valid_position(positions):
-                    break
-                else:
-                    self.log.log_warning('place_ships', f'Invalid position for placing {ship.name}.')
-
-            for (r, c) in positions:
-                if ship.name == 'Carrier':
-                    self.board[r][c] = "C"
-                elif ship.name == 'Battleship':
-                    self.board[r][c] = "B"
-                elif ship.name == 'Cruiser':
-                    self.board[r][c] = "R"
-                elif ship.name == 'Submarine':
-                    self.board[r][c] = "S"
-                elif ship.name == 'Destroyer':
-                    self.board[r][c] = "D"
-                else:
-                    self.log.log_error('place_ships', f'Invalid ship name: {ship.name}')
-                    return
-
-            self.log.log_info('place_ships', f'Ship, {ship.name}, placed at positions: {positions}, '
-                                             f'with an orientation of: {orientation}')
-            ship.place_ship(positions)
-        self.log.log_info('place_ships', 'Ships placed for the player')
-
-
-    def is_valid_position(self, positions):
-        for (row, col) in positions:
-            if row < 0 or row >= self.board.board_size[0] or col < 0 or col >= self.board.board_size[1]:
-                return False
-            if self.board.board[row][col] != "0":
-                return False
-        return True
-
-    def show_ships(self, player):
-        board = player.board.board
-        for row in board:
-            print(' '.join(row))
-        self.log.log_info('show_ships', 'Player ships displayed')
+        # Board for the player to track where they
+        # have shot at and where the enemy players ships are
+        self.shot_tracker = Board()
 
     def shoot(self, position):
         pass
