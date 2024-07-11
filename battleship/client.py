@@ -7,15 +7,16 @@ from networking.network import Network
 
 
 class Client:
-    def __init__(self, client_num):
+    def __init__(self, player):
         self.log = Logger(self.__class__.__name__)
         self.running = True
-        self.net = Network((f'127.0.0.{client_num}', 65433), is_server=False)
+        self.net = Network((f'127.0.0.2', 65433), is_server=False)
         self.reader = None
         self.writer = None
+        self.player = player
 
     async def start_client(self):
-        reader, writer = await self.net.client_connects()
+        reader, writer = await self.net.client_connect()
         if not writer:
             return
 
@@ -29,7 +30,7 @@ class Client:
         await self.writer.drain()
 
     def disconnect(self):
-        self.net.disconnect()
+        self.net.client_disconnect()
 
     async def handle_user_input(self):
         while self.running:

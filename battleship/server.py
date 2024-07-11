@@ -64,7 +64,7 @@ class Server:
             self.handle_show_player_boards()
         return {"status": "unknown command"}
 
-    def handle_shoot(self, addr, x: int, y: int):
+    def handle_shoot(self, attacker, target, x: int, y: int):
         # Logic for handling a shot at coordinates (x, y)
         target = self.get_opponent(addr)
         if not target:

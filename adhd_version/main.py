@@ -47,11 +47,11 @@ def start_client():
     # Function to listen for the 'q' keypress to stop the server
     def listen_for_keypress():
         keyboard.wait('q')
-        client.net.disconnect()
+        client.net.client_disconnect()
 
     # Handle termination signals
     def signal_handler(sig, frame):
-        client.net.disconnect()
+        client.net.client_disconnect()
         shutdown_event.set()
 
     signal.signal(signal.SIGINT, signal_handler)
