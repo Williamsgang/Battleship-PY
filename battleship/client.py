@@ -1,71 +1,116 @@
 # battleship/client.py
-import asyncio
-import pickle
 
-from log.logger import Logger
-from networking.network import Network
+import pygame.display
+from pygame import font
+
+import server
+from bsp import Player
+from config import constants
+from log import logger
+from network import Network
+
+log = logger.Logger('client')
+
+# Initialize pygame
+pygame.init()
+
+SCREEN = pygame.display.set_mode(constants.SCREEN)
+pygame.display.set_caption("Battleship Client")
+
+font = pygame.font.SysFont('comicsans', 40)
 
 
-class Client:
-    def __init__(self, player):
-        self.log = Logger(self.__class__.__name__)
-        self.running = True
-        self.net = Network((f'127.0.0.2', 65433), is_server=False)
-        self.reader = None
-        self.writer = None
-        self.player = player
+class Button:
+    def __init__(self, text, x, y, color):
+        self.text = text
+        self.x = x
+        self.y = y
+        self.color = color
+        self.width = 150
+        self.height = 100
 
-    async def start_client(self):
-        reader, writer = await self.net.client_connect()
-        if not writer:
-            return
+    def draw(self, win):
+        pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height))
+        text = font.render(self.text, 1, (255, 255, 255))
+        win.blit(text, (self.x + round(self.width / 2) - round(text.get_width() / 2),
+                        self.y + round(self.height / 2) - round(text.get_height() / 2)))
 
-        self.reader, self.writer = reader, writer
-        self.log.log_info('start_client', 'Connected to server')
+    def click(self, pos):
+        x1 = pos[0]
+        y1 = pos[1]
+        if self.x <= x1 <= self.x + self.width and self.y <= y1 <= self.y + self.height:
+            return True
+        else:
+            return False
 
-        await asyncio.gather(self.handle_user_input(), self.handle_server_response())
 
-    async def send_command(self, command):
-        self.writer.write(pickle.dumps(command))
-        await self.writer.drain()
+def redraw_screen(screen,  player):
+    screen.fill(constants.BLACK)
 
-    def disconnect(self):
-        self.net.client_disconnect()
+    # Display Player 1 ship locations
+    ship_info = "Player 1 ship locations: " + ", ".join(
+        [f"{ship.name} at {ship.indexes}" for ship in player.ships.values()]
+    )
+    display_text(screen, ship_info, (10, constants.HEIGHT - 50))
 
-    async def handle_user_input(self):
-        while self.running:
-            command = await asyncio.get_event_loop().run_in_executor(None, input, "Enter command: ")
-            if command.startswith("shoot"):
-                _, x, y = command.split()
-                await self.send_command({"cmd": "shoot", "x": int(x), "y": int(y)})
-            elif command.startswith("show_boards"):
-                _, player = command.split()
-                await self.send_command({"cmd": "show_boards", "player": player.ship_tracker})
-            elif command == "exit":
-                self.running = False
-                self.disconnect()
+    pygame.display.update()
+
+
+def display_text(surface, text, position, color=constants.WHITE):
+    text_surface = font.render(text, True, color)
+    surface.blit(text_surface, position)
+
+
+# function to draw a grid
+def draw_grid(surface, left=0, top=0):
+    for row in range(constants.BOARD_SIZE):
+        for col in range(constants.BOARD_SIZE):
+            x = left + col * constants.SQ_SIZE
+            y = top + row * constants.SQ_SIZE
+            rectangle = pygame.Rect(x, y, constants.SQ_SIZE, constants.SQ_SIZE)
+            pygame.draw.rect(surface, constants.GREEN, rectangle, 1)  # Draw the grid with a green color
+
+
+# function to draw ships onto the position grids
+def draw_ships(player, surface, left=0, top=0):
+    for ship in player.ships.values():
+        for (r, c) in ship.indexes:
+            x = left + c * constants.SQ_SIZE + constants.INDENT
+            y = top + r * constants.SQ_SIZE + constants.INDENT
+            if ship.orientation == "h":
+                width = ship.size * constants.SQ_SIZE - 2 * constants.INDENT
+                height = constants.SQ_SIZE - 2 * constants.INDENT
             else:
-                print("Unknown command")
+                width = constants.SQ_SIZE - 2 * constants.INDENT
+                height = ship.size * constants.SQ_SIZE - 2 * constants.INDENT
+            rectangle = pygame.Rect(x, y, width, height)
+            pygame.draw.rect(surface, constants.WHITE, rectangle, border_radius=15)
 
-    async def handle_server_response(self):
-        while self.running:
-            try:
-                response_data = await self.reader.read(100)
-                if response_data:
-                    response = pickle.loads(response_data)
-                    print(f"Response: {response}")
-                else:
-                    print("Server closed connection")
-                    self.running = False
-            except Exception as e:
-                print(f"Error receiving data: {e}")
-                self.running = False
+
+def main():
+    run = True
+    n = Network()
+    p1 = server.Server.players[0]
+    p2 = server.players[1]
+    clock = pygame.time.Clock()
+
+    while run:
+        clock.tick(60)
+        p2 = n.send(p1)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+
+        SCREEN.fill(constants.BLACK)
+
+    # Debugging output to verify the drawing process
+    print("Redrawing screen")
+    print(f"Player 1 Ships: {[(ship.name, ship.row, ship.col) for ship in p1.ships.values()]}")
+
+    pygame.quit()
 
 
 if __name__ == "__main__":
-    client_num = 1
-    client = Client(client_num)
-    try:
-        asyncio.run(client.start_client())
-    except KeyboardInterrupt:
-        client.disconnect()
+    main()

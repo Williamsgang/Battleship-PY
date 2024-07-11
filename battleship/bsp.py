@@ -185,6 +185,7 @@ class Player:
         self.ships = Ships().ships
         self.ship_tracker = Board()
         self.ship_tracker.place_ships(self.ships)
+        self.ship_locations = self.ship_tracker.get_ships(self)
 
         # Board for the player to track where they
         # have shot at and where the enemy players ships are
